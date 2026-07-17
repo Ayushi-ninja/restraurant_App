@@ -1,6 +1,13 @@
 // src/components/Input.tsx
 import React, { useState } from 'react';
-import { View, Text, TextInput, TextInputProps, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TextInputProps,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 
@@ -8,30 +15,61 @@ interface InputProps extends TextInputProps {
   label: string;
   error?: string;
   isPassword?: boolean;
+  inputRef?: React.Ref<TextInput>;
 }
 
-export default function Input({ label, error, isPassword, style, ...props }: InputProps) {
-  const [secureText, setSecureText] = useState(isPassword);
+export default function Input({
+  label,
+  error,
+  isPassword,
+  style,
+  onFocus,
+  onBlur,
+  inputRef,
+  ...props
+}: InputProps) {
+  const [secureText, setSecureText] = useState(!!isPassword);
+  const [focused, setFocused] = useState(false);
 
   return (
-    <View className="w-full mb-4">
-      <Text className="text-sm font-semibold text-neutral-700 mb-1.5">{label}</Text>
+    <View style={styles.wrap}>
+      <Text style={styles.label}>{label}</Text>
       <View
-        className={`w-full h-13 flex-row items-center border rounded-xl px-4 bg-white ${
-          error ? 'border-red-500' : 'border-neutral-200 focus:border-primary'
-        }`}
+        style={[
+          styles.field,
+          {
+            borderColor: error
+              ? colors.error
+              : focused
+                ? colors.primary
+                : colors.border,
+          },
+        ]}
       >
         <TextInput
+          ref={inputRef}
           secureTextEntry={secureText}
-          className="flex-1 text-base text-neutral-900 h-full py-0"
+          style={[styles.input, style]}
           placeholderTextColor="#B0A898"
           autoCapitalize="none"
+          autoCorrect={false}
+          onFocus={(e) => {
+            setFocused(true);
+            onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setFocused(false);
+            onBlur?.(e);
+          }}
           {...props}
         />
-        {isPassword && (
+        {isPassword ? (
           <TouchableOpacity
-            onPress={() => setSecureText(!secureText)}
-            className="h-full items-center justify-center pl-2"
+            onPress={() => setSecureText((v) => !v)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            style={styles.eye}
+            accessibilityRole="button"
+            accessibilityLabel={secureText ? 'Show password' : 'Hide password'}
           >
             {secureText ? (
               <EyeOff size={20} color="#8C8278" />
@@ -39,9 +77,50 @@ export default function Input({ label, error, isPassword, style, ...props }: Inp
               <Eye size={20} color="#8C8278" />
             )}
           </TouchableOpacity>
-        )}
+        ) : null}
       </View>
-      {error && <Text className="text-xs text-red-500 mt-1 font-medium">{error}</Text>}
+      {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  wrap: {
+    width: '100%',
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#4A4239',
+    marginBottom: 6,
+  },
+  field: {
+    width: '100%',
+    height: 52,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#FFFFFF',
+  },
+  input: {
+    flex: 1,
+    height: '100%',
+    paddingVertical: 0,
+    fontSize: 16,
+    color: '#1A1410',
+  },
+  eye: {
+    height: '100%',
+    justifyContent: 'center',
+    paddingLeft: 8,
+  },
+  error: {
+    marginTop: 4,
+    fontSize: 12,
+    fontWeight: '500',
+    color: colors.error,
+  },
+});

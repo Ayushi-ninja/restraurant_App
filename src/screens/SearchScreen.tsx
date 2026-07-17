@@ -6,7 +6,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   SectionList,
   Image,
@@ -16,7 +15,9 @@ import {
   Switch,
   Dimensions,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation, type NavigationProp } from '@react-navigation/native';
+import type { RootStackParamList } from '../navigation/types';
 import {
   Search,
   X,
@@ -62,7 +63,7 @@ function DishResultCard({ item, onPress }: { item: MenuItem; onPress: () => void
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.8}
-      className="flex-row bg-white rounded-2xl mb-3 border border-neutral-100 overflow-hidden shadow-sm shadow-neutral-100/40"
+      className="flex-row bg-white rounded-2xl mb-3 border border-neutral-100 overflow-hidden"
     >
       <Image
         source={{ uri: item.imageUrl }}
@@ -242,10 +243,10 @@ function FilterSheet({
         </ScrollView>
 
         {/* Apply CTA */}
-        <SafeAreaView className="px-5 pt-3 pb-3 bg-neutral-50/95 border-t border-neutral-100">
+        <SafeAreaView className="px-5 pt-3 pb-3 bg-neutral-50 border-t border-neutral-100">
           <TouchableOpacity
             onPress={() => { onApply(draft); onClose(); }}
-            className="bg-primary rounded-2xl py-4 items-center shadow-lg shadow-primary/30"
+            className="bg-primary rounded-2xl py-4 items-center"
           >
             <Text className="text-white font-extrabold text-base">Apply Filters</Text>
           </TouchableOpacity>
@@ -257,7 +258,7 @@ function FilterSheet({
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 export default function SearchScreen() {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const inputRef = useRef<TextInput>(null);
 
   const [query, setQuery] = useState('');

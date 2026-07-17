@@ -1,6 +1,7 @@
 // src/screens/SignupScreen.tsx
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,6 +11,7 @@ import { MOCK_USER } from '../data/users';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { Soup } from 'lucide-react-native';
+import { shadows } from '../theme/shadows';
 
 const signupSchema = z
   .object({
@@ -80,7 +82,7 @@ export default function SignupScreen() {
           <View className="flex-1 justify-center px-6 py-8">
             {/* Logo Area */}
             <View className="items-center mb-8">
-              <View className="w-16 h-16 bg-primary rounded-2xl items-center justify-center mb-4 rotate-12 shadow-lg shadow-primary/20">
+              <View className="w-16 h-16 bg-primary rounded-2xl items-center justify-center mb-4 rotate-12" style={shadows.primarySm}>
                 <Soup size={32} color="white" />
               </View>
               <Text className="text-3xl font-extrabold text-neutral-900">Create Account</Text>

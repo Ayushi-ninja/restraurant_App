@@ -5,14 +5,15 @@ import {
   View,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   ScrollView,
   Switch,
   Image,
   Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation, type NavigationProp } from '@react-navigation/native';
+import type { RootStackParamList } from '../navigation/types';
 import {
   User,
   MapPin,
@@ -92,8 +93,10 @@ function SettingsRow({
 }
 
 export default function ProfileScreen() {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { logout } = useUserStore();
+  const user = useUserStore((s) => s.user);
+  const favoriteRestaurantIds = useUserStore((s) => s.favoriteRestaurantIds);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [darkModeEnabled, setDarkModeEnabled] = useState(false);
 
@@ -170,7 +173,7 @@ export default function ProfileScreen() {
           <SettingsRow
             icon={MapPin}
             label="Saved Addresses"
-            subtitle={`${useUserStore.getState().user?.addresses?.length ?? 0} saved`}
+            subtitle={`${user?.addresses?.length ?? 0} saved`}
             iconBg="bg-blue-50"
             iconColor="#3B82F6"
             onPress={() => navigation.navigate('SavedAddresses')}
@@ -188,12 +191,12 @@ export default function ProfileScreen() {
             label="Promo Codes & Offers"
             iconBg="bg-amber-50"
             iconColor="#D97706"
-            onPress={() => navigation.navigate('Placeholder', { title: 'Promo Codes' })}
+            onPress={() => navigation.navigate('Offers')}
           />
           <SettingsRow
             icon={Heart}
             label="Favourite Restaurants"
-            subtitle={`${useUserStore.getState().favoriteRestaurantIds.length} saved`}
+            subtitle={`${favoriteRestaurantIds.length} saved`}
             iconBg="bg-red-50"
             iconColor="#EF4444"
             onPress={() => navigation.navigate('Favorites')}

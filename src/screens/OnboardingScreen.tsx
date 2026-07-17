@@ -6,13 +6,14 @@ import {
   ScrollView,
   Dimensions,
   TouchableOpacity,
-  SafeAreaView,
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors } from '../theme/colors';
+import { shadows } from '../theme/shadows';
 import { UtensilsCrossed, Truck, ShieldCheck, ChevronRight } from 'lucide-react-native';
 
 const ONBOARDING_KEY = '@has_onboarded';
@@ -151,7 +152,8 @@ export default function OnboardingScreen() {
           <TouchableOpacity
             onPress={handleComplete}
             activeOpacity={0.8}
-            className="w-full bg-primary py-4 rounded-xl items-center justify-center shadow-md shadow-primary/20"
+            className="w-full bg-primary py-4 rounded-xl items-center justify-center"
+            style={shadows.primarySm}
           >
             <Text className="text-white font-bold text-base">Get Started</Text>
           </TouchableOpacity>

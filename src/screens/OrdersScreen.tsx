@@ -4,12 +4,13 @@ import {
   View,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   ScrollView,
   Image,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation, type NavigationProp } from '@react-navigation/native';
+import type { RootStackParamList } from '../navigation/types';
 import { ClipboardList, ChevronRight, Clock, Star, RefreshCcw } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 
@@ -52,7 +53,7 @@ const PAST_ORDERS = [
 ];
 
 export default function OrdersScreen() {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [activeTab, setActiveTab] = useState<TabKey>('active');
 
   const renderActiveOrders = () => {
@@ -74,8 +75,8 @@ export default function OrdersScreen() {
       <TouchableOpacity
         key={order.id}
         activeOpacity={0.8}
-        onPress={() => navigation.navigate('OrderTracking')}
-        className="bg-white rounded-2xl p-4 mb-4 border border-neutral-100 shadow-sm shadow-neutral-100/50"
+        onPress={() => navigation.navigate('OrderDetails', { orderId: order.id })}
+        className="bg-white rounded-2xl p-4 mb-4 border border-neutral-100"
       >
         <View className="flex-row items-center justify-between border-b border-neutral-50 pb-3 mb-3">
           <View className="flex-row items-center">
@@ -108,10 +109,13 @@ export default function OrdersScreen() {
         </View>
 
         <View className="mt-4 bg-primary-50 rounded-xl p-3 flex-row justify-between items-center">
-          <View className="flex-row items-center">
+          <TouchableOpacity
+            className="flex-row items-center flex-1"
+            onPress={() => navigation.navigate('OrderTracking')}
+          >
             <Clock size={16} color={colors.primary} />
             <Text className="text-sm font-bold text-primary ml-2">Track Order</Text>
-          </View>
+          </TouchableOpacity>
           <ChevronRight size={18} color={colors.primary} />
         </View>
       </TouchableOpacity>
@@ -136,9 +140,11 @@ export default function OrdersScreen() {
     return PAST_ORDERS.map((order) => {
       const isDelivered = order.status === 'Delivered';
       return (
-        <View
+        <TouchableOpacity
           key={order.id}
-          className="bg-white rounded-2xl p-4 mb-4 border border-neutral-100 shadow-sm shadow-neutral-100/50"
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate('OrderDetails', { orderId: order.id })}
+          className="bg-white rounded-2xl p-4 mb-4 border border-neutral-100"
         >
           <View className="flex-row items-center justify-between border-b border-neutral-50 pb-3 mb-3">
             <View
@@ -183,13 +189,16 @@ export default function OrdersScreen() {
             </TouchableOpacity>
             
             {isDelivered && (
-              <TouchableOpacity className="flex-1 bg-amber-50 py-3 rounded-xl items-center justify-center flex-row ml-1">
+              <TouchableOpacity
+                className="flex-1 bg-amber-50 py-3 rounded-xl items-center justify-center flex-row ml-1"
+                onPress={() => navigation.navigate('RateReview', { orderId: order.id })}
+              >
                 <Star size={14} color="#D97706" fill="transparent" />
                 <Text className="text-sm font-bold text-amber-700 ml-2">Rate Order</Text>
               </TouchableOpacity>
             )}
           </View>
-        </View>
+        </TouchableOpacity>
       );
     });
   };
@@ -206,7 +215,7 @@ export default function OrdersScreen() {
             <TouchableOpacity
               onPress={() => setActiveTab('active')}
               className={`flex-1 py-2.5 rounded-lg items-center ${
-                activeTab === 'active' ? 'bg-white shadow-sm' : 'bg-transparent'
+                activeTab === 'active' ? 'bg-white' : 'bg-transparent'
               }`}
             >
               <Text
@@ -220,7 +229,7 @@ export default function OrdersScreen() {
             <TouchableOpacity
               onPress={() => setActiveTab('past')}
               className={`flex-1 py-2.5 rounded-lg items-center ${
-                activeTab === 'past' ? 'bg-white shadow-sm' : 'bg-transparent'
+                activeTab === 'past' ? 'bg-white' : 'bg-transparent'
               }`}
             >
               <Text

@@ -4,6 +4,7 @@ import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { Plus, Minus } from 'lucide-react-native';
 import type { MenuItem } from '../types';
 import { colors } from '../theme/colors';
+import { shadows } from '../theme/shadows';
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -19,9 +20,8 @@ export default function MenuItemCard({ item, quantity, onAdd, onRemove, onTap }:
     <TouchableOpacity
       activeOpacity={onTap ? 0.88 : 1}
       onPress={onTap}
-      className={`flex-row bg-white rounded-2xl mb-3 overflow-hidden border ${
-        !item.isAvailable ? 'opacity-50' : 'border-neutral-100'
-      } shadow-sm shadow-neutral-100/60`}
+      className="flex-row bg-white rounded-2xl mb-3 overflow-hidden border border-neutral-100"
+      style={[shadows.sm, !item.isAvailable ? { opacity: 0.5 } : null]}
     >
       {/* Text block */}
       <View className="flex-1 p-4 justify-between">
@@ -69,13 +69,17 @@ export default function MenuItemCard({ item, quantity, onAdd, onRemove, onTap }:
               <TouchableOpacity
                 onPress={onAdd}
                 activeOpacity={0.8}
-                className="w-8 h-8 bg-primary rounded-full items-center justify-center shadow-md shadow-primary/40"
+                className="w-8 h-8 bg-primary rounded-full items-center justify-center"
+                style={shadows.primarySm}
               >
                 <Plus size={16} color="white" strokeWidth={2.5} />
               </TouchableOpacity>
             ) : (
               // Full stepper when in cart
-              <View className="flex-row items-center bg-white rounded-full border border-neutral-200 shadow-sm shadow-neutral-100 px-1 py-1">
+              <View
+                className="flex-row items-center bg-white rounded-full border border-neutral-200 px-1 py-1"
+                style={shadows.sm}
+              >
                 <TouchableOpacity
                   onPress={onRemove}
                   className="w-6 h-6 items-center justify-center"

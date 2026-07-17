@@ -1,15 +1,27 @@
 // src/screens/LoginScreen.tsx
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useRef, useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  TextInput,
+  StyleSheet,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { Soup } from 'lucide-react-native';
+
 import { useUserStore } from '../store/userStore';
 import { MOCK_USER } from '../data/users';
 import Input from '../components/Input';
 import Button from '../components/Button';
-import { Soup } from 'lucide-react-native';
+import { shadows } from '../theme/shadows';
 import { colors } from '../theme/colors';
 
 const loginSchema = z.object({
@@ -23,6 +35,7 @@ export default function LoginScreen() {
   const navigation = useNavigation();
   const login = useUserStore((state) => state.login);
   const [loading, setLoading] = useState(false);
+  const passwordRef = useRef<TextInput>(null);
 
   const {
     control,
@@ -38,10 +51,8 @@ export default function LoginScreen() {
 
   const onSubmit = (data: LoginFormValues) => {
     setLoading(true);
-    // Simulate API call
     setTimeout(() => {
       setLoading(false);
-      // Log in with mock user matching the email, or fallback to Alex
       login({
         ...MOCK_USER,
         email: data.email,
@@ -54,7 +65,6 @@ export default function LoginScreen() {
   };
 
   const handleGuestAccess = () => {
-    // Navigate to Home layout without setting an active user session (guest)
     useUserStore.getState().logout();
     navigation.reset({
       index: 0,
@@ -63,23 +73,26 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-neutral-50">
+    <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1"
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.flex}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 8 : 0}
       >
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
-          <View className="flex-1 justify-center px-6 py-8">
-            {/* Logo area */}
-            <View className="items-center mb-8">
-              <View className="w-16 h-16 bg-primary rounded-2xl items-center justify-center mb-4 rotate-12 shadow-lg shadow-primary/20">
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.scrollContent}
+        >
+          <View style={styles.content}>
+            <View style={styles.logoBlock}>
+              <View style={[styles.logo, shadows.primarySm]}>
                 <Soup size={32} color="white" />
               </View>
-              <Text className="text-3xl font-extrabold text-neutral-900">Welcome Back</Text>
-              <Text className="text-sm text-neutral-500 mt-1">Log in to your account to continue</Text>
+              <Text style={styles.title}>Welcome Back</Text>
+              <Text style={styles.subtitle}>Log in to your account to continue</Text>
             </View>
 
-            {/* Email Field */}
             <Controller
               control={control}
               name="email"
@@ -88,6 +101,11 @@ export default function LoginScreen() {
                   label="Email Address"
                   placeholder="name@example.com"
                   keyboardType="email-address"
+                  textContentType="emailAddress"
+                  autoComplete="email"
+                  returnKeyType="next"
+                  blurOnSubmit={false}
+                  onSubmitEditing={() => passwordRef.current?.focus()}
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
@@ -96,15 +114,19 @@ export default function LoginScreen() {
               )}
             />
 
-            {/* Password Field */}
             <Controller
               control={control}
               name="password"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
+                  inputRef={passwordRef}
                   label="Password"
                   placeholder="Enter your password"
                   isPassword
+                  textContentType="password"
+                  autoComplete="password"
+                  returnKeyType="done"
+                  onSubmitEditing={handleSubmit(onSubmit)}
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
@@ -113,55 +135,68 @@ export default function LoginScreen() {
               )}
             />
 
-            {/* Forgot Password Link */}
-            <TouchableOpacity className="align-self-end mb-6">
-              <Text className="text-sm font-semibold text-primary text-right">Forgot Password?</Text>
+            <TouchableOpacity
+              style={styles.forgotWrap}
+              onPress={() => navigation.navigate('ForgotPassword')}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Text style={styles.forgot}>Forgot Password?</Text>
             </TouchableOpacity>
 
-            {/* Sign In CTA */}
             <Button
               title="Sign In"
               onPress={handleSubmit(onSubmit)}
               loading={loading}
-              className="mb-4"
+              style={styles.signInBtn}
             />
 
-            {/* Social Logins Header */}
-            <View className="flex-row items-center my-6">
-              <View className="flex-1 h-px bg-neutral-200" />
-              <Text className="text-xs font-bold text-neutral-400 mx-4 uppercase tracking-wider">Or connect with</Text>
-              <View className="flex-1 h-px bg-neutral-200" />
+            <Text style={styles.demoHint}>
+              Demo: any valid email + 8+ char password
+            </Text>
+
+            <View style={styles.dividerRow}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>OR CONNECT WITH</Text>
+              <View style={styles.dividerLine} />
             </View>
 
-            {/* Social Logins Buttons */}
-            <View className="flex-row space-x-4 mb-6">
-              {/* Google Button */}
+            <View style={styles.socialRow}>
               <TouchableOpacity
                 activeOpacity={0.8}
-                className="flex-1 h-13 border border-neutral-200 bg-white rounded-xl items-center justify-center flex-row"
+                style={[styles.socialBtn, styles.socialGoogle]}
+                onPress={() =>
+                  navigation.navigate('Placeholder', { title: 'Google Sign-In' })
+                }
               >
-                <Text className="text-sm font-bold text-neutral-800">Google</Text>
+                <Text style={styles.socialGoogleText}>Google</Text>
               </TouchableOpacity>
-              {/* Apple Button */}
               <TouchableOpacity
                 activeOpacity={0.8}
-                className="flex-1 h-13 bg-black rounded-xl items-center justify-center flex-row"
+                style={[styles.socialBtn, styles.socialApple]}
+                onPress={() =>
+                  navigation.navigate('Placeholder', { title: 'Apple Sign-In' })
+                }
               >
-                <Text className="text-sm font-bold text-white">Apple</Text>
+                <Text style={styles.socialAppleText}>Apple</Text>
               </TouchableOpacity>
             </View>
 
-            {/* Navigation to Signup */}
-            <View className="flex-row justify-center mb-6">
-              <Text className="text-neutral-500 text-sm">Don't have an account? </Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Signup' as never)}>
-                <Text className="text-primary font-bold text-sm">Sign Up</Text>
+            <View style={styles.signupRow}>
+              <Text style={styles.signupPrompt}>Don't have an account? </Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Signup')}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Text style={styles.signupLink}>Sign Up</Text>
               </TouchableOpacity>
             </View>
 
-            {/* Continue as Guest */}
-            <TouchableOpacity onPress={handleGuestAccess} className="items-center py-2">
-              <Text className="text-sm font-semibold text-neutral-600 underline">Continue as Guest</Text>
+            <TouchableOpacity
+              onPress={handleGuestAccess}
+              style={styles.guestWrap}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Text style={styles.guestLink}>Continue as Guest</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -169,3 +204,135 @@ export default function LoginScreen() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  flex: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
+  content: {
+    paddingHorizontal: 24,
+    paddingVertical: 32,
+  },
+  logoBlock: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  logo: {
+    width: 64,
+    height: 64,
+    borderRadius: 16,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    transform: [{ rotate: '12deg' }],
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: '800',
+    color: colors.textPrimary,
+  },
+  subtitle: {
+    marginTop: 4,
+    fontSize: 14,
+    color: colors.textSecondary,
+    textAlign: 'center',
+  },
+  forgotWrap: {
+    alignSelf: 'flex-end',
+    marginBottom: 24,
+  },
+  forgot: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  signInBtn: {
+    marginBottom: 16,
+  },
+  demoHint: {
+    fontSize: 12,
+    color: colors.textTertiary,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  dividerLine: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.border,
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.textTertiary,
+    letterSpacing: 0.6,
+  },
+  socialRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 24,
+  },
+  socialBtn: {
+    flex: 1,
+    height: 52,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  socialGoogle: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  socialApple: {
+    backgroundColor: '#000000',
+  },
+  socialGoogleText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#2E2820',
+  },
+  socialAppleText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  signupRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 24,
+  },
+  signupPrompt: {
+    fontSize: 14,
+    color: colors.textSecondary,
+  },
+  signupLink: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.primary,
+  },
+  guestWrap: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  guestLink: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.textSecondary,
+    textDecorationLine: 'underline',
+  },
+});

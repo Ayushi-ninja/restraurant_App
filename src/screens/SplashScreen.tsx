@@ -1,10 +1,10 @@
 // src/screens/SplashScreen.tsx
 import React, { useEffect } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { colors } from '../theme/colors';
 import { Soup } from 'lucide-react-native';
+import { colors } from '../theme/colors';
 
 const ONBOARDING_KEY = '@has_onboarded';
 
@@ -14,7 +14,6 @@ export default function SplashScreen() {
   useEffect(() => {
     const checkOnboardingStatus = async () => {
       try {
-        // Add a slight artificial delay for a premium splash feel (1.5 seconds)
         const [hasOnboarded] = await Promise.all([
           AsyncStorage.getItem(ONBOARDING_KEY),
           new Promise((resolve) => setTimeout(resolve, 1500)),
@@ -33,7 +32,6 @@ export default function SplashScreen() {
         }
       } catch (error) {
         console.error('Error reading onboarding status:', error);
-        // Fallback to onboarding if anything fails
         navigation.reset({
           index: 0,
           routes: [{ name: 'Onboarding' }],
@@ -45,19 +43,51 @@ export default function SplashScreen() {
   }, [navigation]);
 
   return (
-    <View className="flex-1 bg-primary items-center justify-center">
-      <View className="items-center">
-        <View className="w-24 h-24 bg-white/10 rounded-full items-center justify-center mb-6">
+    <View style={styles.root}>
+      <View style={styles.center}>
+        <View style={styles.iconWrap}>
           <Soup size={56} color="white" />
         </View>
-        <Text className="text-4xl font-extrabold text-white tracking-wider mb-2">
-          Craving
-        </Text>
-        <Text className="text-sm font-medium text-primary-100 tracking-widest uppercase mb-12">
-          Bite-sized happiness
-        </Text>
+        <Text style={styles.brand}>Craving</Text>
+        <Text style={styles.tagline}>Bite-sized happiness</Text>
         <ActivityIndicator color="white" size="small" />
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  center: {
+    alignItems: 'center',
+  },
+  iconWrap: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+  },
+  brand: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 1,
+    marginBottom: 8,
+  },
+  tagline: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#FFE4D6',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    marginBottom: 48,
+  },
+});

@@ -9,11 +9,11 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   Animated,
   Dimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation, type RouteProp } from '@react-navigation/native';
 import {
   MapPin,
@@ -34,6 +34,7 @@ import { getReviewsByRestaurant, type Review } from '../data/reviews';
 import { useCartStore } from '../store/cartStore';
 import { useUserStore } from '../store/userStore';
 import { colors } from '../theme/colors';
+import { shadows } from '../theme/shadows';
 import MenuItemCard from '../components/MenuItemCard';
 import MenuItemBottomSheet from '../components/MenuItemBottomSheet';
 import CartTray from '../components/CartTray';
@@ -59,7 +60,7 @@ function ReviewCard({ review }: { review: Review }) {
   });
 
   return (
-    <View className="bg-white border border-neutral-100 rounded-2xl p-4 mb-3 shadow-sm shadow-neutral-100/60">
+    <View className="bg-white border border-neutral-100 rounded-2xl p-4 mb-3">
       {/* Header row */}
       <View className="flex-row items-center mb-3">
         <Image
@@ -293,7 +294,8 @@ export default function RestaurantDetailScreen() {
               <TouchableOpacity
                 onPress={() => navigation.goBack()}
                 activeOpacity={0.85}
-                className="w-10 h-10 bg-white/90 rounded-full items-center justify-center shadow-sm"
+                className="w-10 h-10 rounded-full items-center justify-center"
+                style={[{ backgroundColor: 'rgba(255,255,255,0.92)' }, shadows.sm]}
               >
                 <ChevronLeft size={22} color="#1A1410" />
               </TouchableOpacity>
@@ -301,7 +303,8 @@ export default function RestaurantDetailScreen() {
               <TouchableOpacity
                 onPress={() => toggleFavoriteRestaurant(restaurantId)}
                 activeOpacity={0.85}
-                className="w-10 h-10 bg-white/90 rounded-full items-center justify-center shadow-sm"
+                className="w-10 h-10 rounded-full items-center justify-center"
+                style={[{ backgroundColor: 'rgba(255,255,255,0.92)' }, shadows.sm]}
               >
                 <Heart
                   size={20}
@@ -327,7 +330,7 @@ export default function RestaurantDetailScreen() {
         </View>
 
         {/* ── INFO CARD (floats up over the hero) ───────────────────────── */}
-        <View className="bg-white mx-4 -mt-5 rounded-2xl px-5 py-4 shadow-md shadow-neutral-300/40 border border-neutral-100 mb-3">
+        <View className="bg-white mx-4 -mt-5 rounded-2xl px-5 py-4 border border-neutral-100 mb-3">
           {/* Name + rating row */}
           <View className="flex-row items-start justify-between mb-1">
             <Text
@@ -484,8 +487,7 @@ export default function RestaurantDetailScreen() {
                             onAdd={() => addItem(item, item.price, [])}
                             onRemove={() => removeItem(item.id)}
                             onTap={() => {
-                              setSelectedMenuItem(item);
-                              setIsSheetVisible(true);
+                              navigation.navigate('FoodItemDetail', { menuItemId: item.id });
                             }}
                           />
                         ))}
@@ -501,7 +503,7 @@ export default function RestaurantDetailScreen() {
         {activeTab === 'reviews' && (
           <View className="px-4 pt-4">
             {/* Summary row */}
-            <View className="bg-white border border-neutral-100 rounded-2xl p-4 mb-4 flex-row items-center shadow-sm shadow-neutral-100/60">
+            <View className="bg-white border border-neutral-100 rounded-2xl p-4 mb-4 flex-row items-center">
               <View className="items-center mr-5">
                 <Text className="text-4xl font-extrabold text-neutral-950">
                   {restaurant.rating.toFixed(1)}

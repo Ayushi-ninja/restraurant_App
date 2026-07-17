@@ -3,6 +3,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { ShoppingBag, ArrowRight } from 'lucide-react-native';
+import { shadows } from '../theme/shadows';
 
 interface CartTrayProps {
   totalItems: number;
@@ -18,10 +19,14 @@ export default function CartTray({ totalItems, subtotal, onPress }: CartTrayProp
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={onPress}
-        className="bg-primary rounded-2xl flex-row items-center justify-between px-5 py-4 shadow-xl shadow-primary/40"
+        className="bg-primary rounded-2xl flex-row items-center justify-between px-5 py-4"
+        style={shadows.primaryLg}
       >
         {/* Item count bubble */}
-        <View className="bg-white/20 rounded-xl px-3 py-1 flex-row items-center">
+        <View
+          className="rounded-xl px-3 py-1 flex-row items-center"
+          style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
+        >
           <ShoppingBag size={16} color="white" />
           <Text className="text-white font-bold text-sm ml-2">
             {totalItems} {totalItems === 1 ? 'item' : 'items'}

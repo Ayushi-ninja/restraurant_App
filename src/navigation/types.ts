@@ -13,33 +13,29 @@ export type TabParamList = {
 
 // ─── Root Stack (wraps tabs + modal/push screens) ────────────────────────────
 export type RootStackParamList = {
-  /** Initial app screen to determine routing */
   Splash: undefined;
-  /** Onboarding welcome slider */
   Onboarding: undefined;
-  /** Authenticated user log in */
   Login: undefined;
-  /** Authenticated user sign up */
   Signup: undefined;
-  /** The bottom-tab shell */
+  ForgotPassword: undefined;
+  OTPVerification: { email: string; purpose: 'reset' | 'signup' };
+  ResetPassword: { email: string };
   Tabs: NavigatorScreenParams<TabParamList>;
-  /** Restaurant menu page */
   RestaurantDetail: { restaurantId: string };
-  /** Shopping cart overview */
+  FoodItemDetail: { menuItemId: string };
+  Categories: { categoryId?: string } | undefined;
+  Offers: undefined;
   Cart: undefined;
-  /** Order summary & payment */
   Checkout: undefined;
-  /** Live order tracking */
+  OrderSuccess: { orderId: string; total: number };
   OrderTracking: undefined;
-  /** Saved favorite restaurants and dishes */
+  OrderDetails: { orderId: string };
+  RateReview: { orderId: string };
   Favorites: undefined;
-  /** Manage delivery addresses */
   SavedAddresses: undefined;
-  /** Generic placeholder for unimplemented screens */
   Placeholder: { title: string };
 };
 
-// ─── Declaration merging so useNavigation() is typed globally ─────────────────
 declare global {
   namespace ReactNavigation {
     interface RootParamList extends RootStackParamList {}

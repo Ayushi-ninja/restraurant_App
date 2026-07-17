@@ -8,11 +8,12 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   TextInput,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation, type NavigationProp } from '@react-navigation/native';
+import type { RootStackParamList } from '../navigation/types';
 import { ChevronLeft, Plus, Minus, Trash2, Tag, ArrowRight, ShoppingBag } from 'lucide-react-native';
 
 import { useCartStore } from '../store/cartStore';
@@ -20,8 +21,12 @@ import { MOCK_RESTAURANTS } from '../data/restaurants';
 import { colors } from '../theme/colors';
 
 export default function CartScreen() {
-  const navigation = useNavigation<any>();
-  const { items, restaurantId, setQuantity, removeItem, subtotal, totalItems } = useCartStore();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const items = useCartStore((s) => s.items);
+  const restaurantId = useCartStore((s) => s.restaurantId);
+  const setQuantity = useCartStore((s) => s.setQuantity);
+  const removeItem = useCartStore((s) => s.removeItem);
+  const subtotalFn = useCartStore((s) => s.subtotal);
 
   const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
@@ -30,7 +35,7 @@ export default function CartScreen() {
   const restaurant = MOCK_RESTAURANTS.find((r) => r.id === restaurantId);
 
   // Bill calculation
-  const sub = subtotal();
+  const sub = subtotalFn();
   const deliveryFee = restaurant?.deliveryFee ?? 0;
   const taxes = sub * 0.08; // 8% mock tax
   const total = sub + deliveryFee + taxes - discount;
@@ -65,7 +70,7 @@ export default function CartScreen() {
           </Text>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            className="bg-primary px-6 py-4 rounded-2xl shadow-lg shadow-primary/30"
+            className="bg-primary px-6 py-4 rounded-2xl"
           >
             <Text className="text-white font-bold text-base">Browse Restaurants</Text>
           </TouchableOpacity>
@@ -139,7 +144,7 @@ export default function CartScreen() {
                   <View className="flex-row items-center bg-neutral-50 rounded-xl px-1.5 py-1.5 border border-neutral-100">
                     <TouchableOpacity
                       onPress={() => setQuantity(cartItem.menuItem.id, cartItem.quantity - 1)}
-                      className="w-7 h-7 items-center justify-center bg-white rounded-lg shadow-sm"
+                      className="w-7 h-7 items-center justify-center bg-white rounded-lg"
                     >
                       <Minus size={14} color="#1A1410" strokeWidth={2.5} />
                     </TouchableOpacity>
@@ -148,7 +153,7 @@ export default function CartScreen() {
                     </Text>
                     <TouchableOpacity
                       onPress={() => setQuantity(cartItem.menuItem.id, cartItem.quantity + 1)}
-                      className="w-7 h-7 items-center justify-center bg-white rounded-lg shadow-sm"
+                      className="w-7 h-7 items-center justify-center bg-white rounded-lg"
                     >
                       <Plus size={14} color="#1A1410" strokeWidth={2.5} />
                     </TouchableOpacity>
@@ -246,7 +251,7 @@ export default function CartScreen() {
       >
         <TouchableOpacity
           activeOpacity={0.85}
-          className="bg-primary rounded-2xl py-4 flex-row items-center justify-center shadow-lg shadow-primary/30"
+          className="bg-primary rounded-2xl py-4 flex-row items-center justify-center"
           onPress={() => {
             navigation.navigate('Checkout');
           }}

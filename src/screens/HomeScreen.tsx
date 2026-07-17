@@ -6,9 +6,9 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  SafeAreaView,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { MapPin, Bell, Search, Filter } from 'lucide-react-native';
 import { colors } from '../theme/colors';
@@ -97,7 +97,7 @@ export default function HomeScreen() {
             <TouchableOpacity
               activeOpacity={0.9}
               onPress={handleSearchPress}
-              className="w-full h-13 border border-neutral-200 bg-white rounded-2xl flex-row items-center px-4 shadow-sm shadow-neutral-100"
+              className="w-full h-13 border border-neutral-200 bg-white rounded-2xl flex-row items-center px-4"
             >
               <Search size={20} color="#8C8278" />
               <Text className="flex-1 text-sm text-neutral-400 ml-3">
@@ -125,7 +125,12 @@ export default function HomeScreen() {
                   <TouchableOpacity
                     key={cat.id}
                     activeOpacity={0.8}
-                    onPress={() => setSelectedCategory(cat.id)}
+                    onPress={() => {
+                      setSelectedCategory(cat.id);
+                      if (cat.id !== 'all') {
+                        navigation.navigate('Categories', { categoryId: cat.id });
+                      }
+                    }}
                     className={`flex-row items-center px-4 py-2.5 rounded-full mr-3 border ${
                       isSelected
                         ? 'bg-primary border-primary'
@@ -151,7 +156,7 @@ export default function HomeScreen() {
             <View className="mb-6">
               <View className="flex-row items-center justify-between px-6 mb-3">
                 <Text className="text-lg font-bold text-neutral-950">Featured Offers</Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('Offers')}>
                   <Text className="text-xs font-bold text-primary">See All</Text>
                 </TouchableOpacity>
               </View>

@@ -7,14 +7,16 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   Modal,
   TextInput,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import {
   ChevronLeft,
   MapPin,
@@ -43,11 +45,15 @@ const PAYMENT_METHODS = [
 ];
 
 export default function CheckoutScreen() {
-  const navigation = useNavigation<any>();
-  const { items, restaurantId, subtotal, clearCart } = useCartStore();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const items = useCartStore((s) => s.items);
+  const restaurantId = useCartStore((s) => s.restaurantId);
+  const subtotalFn = useCartStore((s) => s.subtotal);
+  const clearCart = useCartStore((s) => s.clearCart);
   const restaurant = MOCK_RESTAURANTS.find((r) => r.id === restaurantId);
 
-  const { user, addAddress } = useUserStore();
+  const user = useUserStore((s) => s.user);
+  const addAddress = useUserStore((s) => s.addAddress);
   const addresses = user?.addresses || [];
   
   // Selections
@@ -65,15 +71,15 @@ export default function CheckoutScreen() {
   const [newDetails, setNewDetails] = useState('');
 
   // Bill calculation (mocked simply for summary)
-  const sub = subtotal();
+  const sub = subtotalFn();
   const deliveryFee = restaurant?.deliveryFee ?? 0;
   const taxes = sub * 0.08;
   const total = sub + deliveryFee + taxes;
 
   const handlePlaceOrder = () => {
-    alert('Order Placed Successfully!');
+    const orderId = `ord_${Date.now().toString().slice(-5)}`;
     clearCart();
-    navigation.navigate('OrderTracking');
+    navigation.replace('OrderSuccess', { orderId, total });
   };
 
   const handleSaveAddress = () => {
@@ -126,7 +132,7 @@ export default function CheckoutScreen() {
             </TouchableOpacity>
           </View>
 
-          <View className="bg-white rounded-2xl p-4 border border-neutral-100 shadow-sm shadow-neutral-100/50 flex-row items-center">
+          <View className="bg-white rounded-2xl p-4 border border-neutral-100 flex-row items-center">
             <View className="w-10 h-10 bg-primary-50 rounded-full items-center justify-center mr-4">
               <MapPin size={20} color={colors.primary} />
             </View>
@@ -144,7 +150,7 @@ export default function CheckoutScreen() {
         {/* ── DELIVERY TIME ──────────────────────────────────────────── */}
         <View className="px-5 mb-6">
           <Text className="text-sm font-extrabold text-neutral-900 mb-3">Delivery Time</Text>
-          <View className="flex-row bg-white rounded-2xl p-1 border border-neutral-100 shadow-sm shadow-neutral-100/50">
+          <View className="flex-row bg-white rounded-2xl p-1 border border-neutral-100">
             <TouchableOpacity
               onPress={() => setDeliveryTime('ASAP')}
               className={`flex-1 py-3 items-center rounded-xl ${
@@ -179,7 +185,7 @@ export default function CheckoutScreen() {
         {/* ── PAYMENT METHOD ─────────────────────────────────────────── */}
         <View className="px-5 mb-6">
           <Text className="text-sm font-extrabold text-neutral-900 mb-3">Payment Method</Text>
-          <View className="bg-white rounded-2xl border border-neutral-100 shadow-sm shadow-neutral-100/50 overflow-hidden">
+          <View className="bg-white rounded-2xl border border-neutral-100 overflow-hidden">
             {PAYMENT_METHODS.map((method, index) => {
               const Icon = method.icon;
               const isSelected = paymentMethodId === method.id;
@@ -221,7 +227,7 @@ export default function CheckoutScreen() {
 
         {/* ── ORDER SUMMARY ACCORDION ────────────────────────────────── */}
         <View className="px-5 mb-6">
-          <View className="bg-white rounded-2xl border border-neutral-100 shadow-sm shadow-neutral-100/50 overflow-hidden">
+          <View className="bg-white rounded-2xl border border-neutral-100 overflow-hidden">
             <TouchableOpacity
               onPress={() => setIsSummaryExpanded(!isSummaryExpanded)}
               activeOpacity={0.7}
@@ -280,7 +286,7 @@ export default function CheckoutScreen() {
       >
         <TouchableOpacity
           activeOpacity={0.85}
-          className="bg-primary rounded-2xl py-4 flex-row items-center justify-between px-5 shadow-lg shadow-primary/30"
+          className="bg-primary rounded-2xl py-4 flex-row items-center justify-between px-5"
           onPress={handlePlaceOrder}
         >
           <Text className="text-white font-extrabold text-base">Place Order</Text>
@@ -391,8 +397,8 @@ export default function CheckoutScreen() {
                 onPress={handleSaveAddress}
                 activeOpacity={0.8}
                 disabled={!newDetails.trim()}
-                className={`py-4 rounded-2xl items-center shadow-lg ${
-                  newDetails.trim() ? 'bg-primary shadow-primary/30' : 'bg-neutral-300 shadow-transparent'
+                className={`py-4 rounded-2xl items-center ${
+                  newDetails.trim() ? 'bg-primary' : 'bg-neutral-300'
                 }`}
               >
                 <Text className="text-white font-extrabold text-base">Save Address</Text>

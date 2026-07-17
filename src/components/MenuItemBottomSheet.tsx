@@ -12,9 +12,9 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
   Dimensions,
-  SafeAreaView,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { X, Plus, Minus, ShoppingBag, ChevronDown, Star } from 'lucide-react-native';
 
 import type { MenuItem } from '../types';
@@ -464,7 +464,7 @@ export default function MenuItemBottomSheet({
           {/* ── Quantity Stepper ──────────────────────────────────────── */}
           <View className="px-5 flex-row items-center justify-between mb-2">
             <Text className="text-base font-bold text-neutral-900">Quantity</Text>
-            <View className="flex-row items-center bg-white border border-neutral-200 rounded-2xl px-2 py-2 shadow-sm">
+            <View className="flex-row items-center bg-white border border-neutral-200 rounded-2xl px-2 py-2">
               <TouchableOpacity
                 onPress={() => setQuantity((q) => Math.max(1, q - 1))}
                 className="w-9 h-9 bg-neutral-100 rounded-xl items-center justify-center"
@@ -488,7 +488,7 @@ export default function MenuItemBottomSheet({
 
         {/* ── Add to Cart CTA (fixed above safe area) ───────────────── */}
         <SafeAreaView
-          className="absolute bottom-0 left-0 right-0 bg-neutral-50/95 border-t border-neutral-100 px-5 pt-3 pb-3"
+          className="absolute bottom-0 left-0 right-0 bg-neutral-50 border-t border-neutral-100 px-5 pt-3 pb-3"
           style={{ shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.06, shadowRadius: 12 }}
         >
           <TouchableOpacity
@@ -497,10 +497,13 @@ export default function MenuItemBottomSheet({
             disabled={!item.isAvailable}
             className={`rounded-2xl py-4 flex-row items-center justify-between px-5 ${
               item.isAvailable ? 'bg-primary' : 'bg-neutral-300'
-            } shadow-lg shadow-primary/30`}
+            }`}
           >
             {/* Left: shopping bag + quantity */}
-            <View className="bg-white/20 w-9 h-9 rounded-xl items-center justify-center">
+            <View
+              className="w-9 h-9 rounded-xl items-center justify-center"
+              style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
+            >
               <ShoppingBag size={18} color="white" />
             </View>
 

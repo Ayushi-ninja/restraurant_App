@@ -5,6 +5,7 @@ import type { Restaurant } from '../types';
 import Rating from './Rating';
 import Badge from './Badge';
 import { Clock, Bike } from 'lucide-react-native';
+import { shadows } from '../theme/shadows';
 
 interface RestaurantCardProps {
   restaurant: Restaurant;
@@ -28,7 +29,8 @@ export default function RestaurantCard({
       <TouchableOpacity
         activeOpacity={0.85}
         onPress={onPress}
-        className="w-68 bg-white border border-neutral-100 rounded-2xl overflow-hidden mr-4 shadow-sm shadow-neutral-200/50"
+        className="w-68 bg-white border border-neutral-100 rounded-2xl overflow-hidden mr-4"
+        style={shadows.sm}
       >
         {/* Card Image banner */}
         <View className="relative w-full h-36">
@@ -73,7 +75,8 @@ export default function RestaurantCard({
     <TouchableOpacity
       activeOpacity={0.85}
       onPress={onPress}
-      className="bg-white border border-neutral-150 rounded-2xl overflow-hidden mb-4 shadow-sm shadow-neutral-200/50 flex-row p-3"
+      className="bg-white border border-neutral-150 rounded-2xl overflow-hidden mb-4 flex-row p-3"
+      style={shadows.sm}
     >
       {/* Thumbnail */}
       <View className="w-24 h-24 rounded-xl overflow-hidden bg-neutral-100">

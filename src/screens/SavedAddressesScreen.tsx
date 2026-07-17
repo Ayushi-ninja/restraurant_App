@@ -4,7 +4,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   ScrollView,
   Modal,
@@ -12,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { MapPin, Plus, Trash2, CheckCircle2, X } from 'lucide-react-native';
 
@@ -19,7 +19,10 @@ import { useUserStore } from '../store/userStore';
 import { colors } from '../theme/colors';
 
 export default function SavedAddressesScreen() {
-  const { user, removeAddress, setDefaultAddress, addAddress } = useUserStore();
+  const user = useUserStore((s) => s.user);
+  const removeAddress = useUserStore((s) => s.removeAddress);
+  const setDefaultAddress = useUserStore((s) => s.setDefaultAddress);
+  const addAddress = useUserStore((s) => s.addAddress);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newLabel, setNewLabel] = useState('Home');
   const [newDetails, setNewDetails] = useState('');
@@ -83,7 +86,7 @@ export default function SavedAddressesScreen() {
                   onPress={() => setDefaultAddress(addr.id)}
                   activeOpacity={0.8}
                   className={`p-4 rounded-2xl mb-3 border ${
-                    isDefault ? 'bg-primary-50 border-primary' : 'bg-white border-neutral-100 shadow-sm shadow-neutral-100/50'
+                    isDefault ? 'bg-primary-50 border-primary' : 'bg-white border-neutral-100'
                   }`}
                 >
                   <View className="flex-row items-start justify-between mb-2">
@@ -97,7 +100,7 @@ export default function SavedAddressesScreen() {
                         {addr.label}
                       </Text>
                       {isDefault && (
-                        <View className="bg-primary/20 px-2 py-0.5 rounded ml-3">
+                        <View className="px-2 py-0.5 rounded ml-3" style={{ backgroundColor: 'rgba(255,90,31,0.2)' }}>
                           <Text className="text-[10px] font-bold text-primary uppercase">Default</Text>
                         </View>
                       )}
@@ -130,7 +133,7 @@ export default function SavedAddressesScreen() {
 
       {/* ── ADD ADDRESS MODAL ────────────────────────────────────────── */}
       <Modal visible={showAddModal} animationType="slide" transparent>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1 justify-end bg-black/40">
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
           <View className="bg-white rounded-t-3xl pt-5 px-5 pb-10">
             <View className="flex-row items-center justify-between mb-6">
               <Text className="text-xl font-bold text-neutral-950">Add Address</Text>
@@ -171,8 +174,8 @@ export default function SavedAddressesScreen() {
               onPress={handleSaveNewAddress}
               activeOpacity={0.8}
               disabled={!newDetails.trim()}
-              className={`py-4 rounded-2xl items-center shadow-lg ${
-                newDetails.trim() ? 'bg-primary shadow-primary/30' : 'bg-neutral-300 shadow-transparent'
+              className={`py-4 rounded-2xl items-center ${
+                newDetails.trim() ? 'bg-primary' : 'bg-neutral-300'
               }`}
             >
               <Text className="text-white font-extrabold text-base">Save Address</Text>

@@ -6,12 +6,13 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   Animated,
   Dimensions,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation, type NavigationProp } from '@react-navigation/native';
+import type { RootStackParamList } from '../navigation/types';
 import {
   MapPin,
   Clock,
@@ -40,7 +41,7 @@ const ORDER_STAGES = [
 ];
 
 export default function OrderTrackingScreen() {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   // In a real app this would be synced via sockets. We'll mock it at index 1 (Preparing).
   const [activeStageIndex, setActiveStageIndex] = useState(1);
@@ -74,7 +75,7 @@ export default function OrderTrackingScreen() {
       <StatusBar barStyle="dark-content" />
 
       {/* ── HEADER ───────────────────────────────────────────────────────── */}
-      <SafeAreaView className="bg-white z-10 shadow-sm shadow-neutral-100/50">
+      <SafeAreaView className="bg-white z-10">
         <View className="flex-row items-center justify-between px-5 py-4">
           <TouchableOpacity
             onPress={() => navigation.navigate('Tabs', { screen: 'Home' })}
@@ -94,17 +95,20 @@ export default function OrderTrackingScreen() {
         {/* ── MAP PLACEHOLDER ────────────────────────────────────────────── */}
         <View className="h-64 bg-neutral-200 relative items-center justify-center border-b border-neutral-200">
           <MapPin size={48} color={colors.primary} opacity={0.3} />
-          <Text className="text-sm font-bold text-neutral-500 mt-2 opacity-50">
+          <Text className="text-sm font-bold text-neutral-500 mt-2">
             Live Delivery Map
           </Text>
           {/* Faux route line */}
-          <View className="absolute bottom-10 left-10 right-10 h-1 bg-primary/20 rounded-full overflow-hidden">
-            <View className="h-full bg-primary/60 w-1/2 rounded-full" />
+          <View
+            className="absolute bottom-10 left-10 right-10 h-1 rounded-full overflow-hidden"
+            style={{ backgroundColor: 'rgba(255,90,31,0.2)' }}
+          >
+            <View className="h-full w-1/2 rounded-full" style={{ backgroundColor: 'rgba(255,90,31,0.6)' }} />
           </View>
         </View>
 
         {/* ── ESTIMATE CARD ──────────────────────────────────────────────── */}
-        <View className="bg-white mx-5 -mt-8 rounded-2xl p-5 shadow-lg shadow-neutral-300/40 border border-neutral-100 mb-6">
+        <View className="bg-white mx-5 -mt-8 rounded-2xl p-5 border border-neutral-100 mb-6">
           <View className="flex-row items-center justify-between">
             <View>
               <Text className="text-xs font-bold text-neutral-500 mb-1 uppercase tracking-wider">
@@ -147,7 +151,7 @@ export default function OrderTrackingScreen() {
                     {isActive ? (
                       <Animated.View
                         style={{ transform: [{ scale: pulseAnim }] }}
-                        className="w-8 h-8 rounded-full bg-primary items-center justify-center shadow-md shadow-primary/40"
+                        className="w-8 h-8 rounded-full bg-primary items-center justify-center"
                       >
                         <Icon size={16} color="white" />
                       </Animated.View>
@@ -182,7 +186,7 @@ export default function OrderTrackingScreen() {
         {/* ── DELIVERY PARTNER (Only visible when out for delivery) ──────── */}
         {activeStageIndex >= 2 && (
           <View className="px-5 mb-6">
-            <View className="bg-white rounded-2xl p-4 border border-neutral-100 shadow-sm flex-row items-center">
+            <View className="bg-white rounded-2xl p-4 border border-neutral-100 flex-row items-center">
               <Image
                 source={{ uri: 'https://i.pravatar.cc/100?img=33' }}
                 className="w-12 h-12 rounded-full bg-neutral-200 mr-4"
@@ -275,7 +279,7 @@ export default function OrderTrackingScreen() {
           <TouchableOpacity
             disabled={activeStageIndex > 0}
             className={`flex-row items-center justify-center p-4 rounded-xl border ${
-              activeStageIndex === 0 ? 'bg-red-50 border-red-100' : 'bg-neutral-50 border-neutral-100 opacity-50'
+              activeStageIndex === 0 ? 'bg-red-50 border-red-100' : 'bg-neutral-50 border-neutral-100'
             }`}
           >
             <Text

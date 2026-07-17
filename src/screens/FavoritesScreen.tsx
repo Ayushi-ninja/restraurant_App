@@ -4,12 +4,13 @@ import {
   View,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   ScrollView,
   Image,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation, type NavigationProp } from '@react-navigation/native';
+import type { RootStackParamList } from '../navigation/types';
 import { Heart, HeartOff, Store, Utensils } from 'lucide-react-native';
 
 import { useUserStore } from '../store/userStore';
@@ -21,10 +22,13 @@ import RestaurantCard from '../components/RestaurantCard';
 type TabKey = 'restaurants' | 'dishes';
 
 export default function FavoritesScreen() {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [activeTab, setActiveTab] = useState<TabKey>('restaurants');
 
-  const { favoriteRestaurantIds, favoriteDishIds, toggleFavoriteRestaurant, toggleFavoriteDish } = useUserStore();
+  const favoriteRestaurantIds = useUserStore((s) => s.favoriteRestaurantIds);
+  const favoriteDishIds = useUserStore((s) => s.favoriteDishIds);
+  const toggleFavoriteRestaurant = useUserStore((s) => s.toggleFavoriteRestaurant);
+  const toggleFavoriteDish = useUserStore((s) => s.toggleFavoriteDish);
 
   const favRestaurants = useMemo(() => {
     return MOCK_RESTAURANTS.filter((r) => favoriteRestaurantIds.includes(r.id));
@@ -59,7 +63,7 @@ export default function FavoritesScreen() {
             />
             <TouchableOpacity
               onPress={() => toggleFavoriteRestaurant(r.id)}
-              className="absolute top-3 right-3 w-10 h-10 bg-white/90 rounded-full items-center justify-center shadow-sm backdrop-blur-md"
+              className="absolute top-3 right-3 w-10 h-10 bg-white rounded-full items-center justify-center"
             >
               <Heart size={20} color={colors.primary} fill={colors.primary} />
             </TouchableOpacity>
@@ -94,12 +98,12 @@ export default function FavoritesScreen() {
                 key={dish.id}
                 onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: dish.restaurantId })}
                 activeOpacity={0.8}
-                className="w-[48%] bg-white rounded-2xl mb-4 border border-neutral-100 overflow-hidden shadow-sm shadow-neutral-100/50 relative"
+                className="w-[48%] bg-white rounded-2xl mb-4 border border-neutral-100 overflow-hidden relative"
               >
                 <Image source={{ uri: dish.imageUrl }} className="w-full h-32 bg-neutral-100" resizeMode="cover" />
                 <TouchableOpacity
                   onPress={() => toggleFavoriteDish(dish.id)}
-                  className="absolute top-2 right-2 w-8 h-8 bg-white/90 rounded-full items-center justify-center shadow-sm backdrop-blur-md"
+                  className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full items-center justify-center"
                 >
                   <Heart size={16} color={colors.primary} fill={colors.primary} />
                 </TouchableOpacity>
@@ -126,7 +130,7 @@ export default function FavoritesScreen() {
           <TouchableOpacity
             onPress={() => setActiveTab('restaurants')}
             className={`flex-1 py-2.5 rounded-lg items-center ${
-              activeTab === 'restaurants' ? 'bg-white shadow-sm' : 'bg-transparent'
+              activeTab === 'restaurants' ? 'bg-white' : 'bg-transparent'
             }`}
           >
             <Text className={`text-sm font-bold ${activeTab === 'restaurants' ? 'text-neutral-900' : 'text-neutral-500'}`}>
@@ -136,7 +140,7 @@ export default function FavoritesScreen() {
           <TouchableOpacity
             onPress={() => setActiveTab('dishes')}
             className={`flex-1 py-2.5 rounded-lg items-center ${
-              activeTab === 'dishes' ? 'bg-white shadow-sm' : 'bg-transparent'
+              activeTab === 'dishes' ? 'bg-white' : 'bg-transparent'
             }`}
           >
             <Text className={`text-sm font-bold ${activeTab === 'dishes' ? 'text-neutral-900' : 'text-neutral-500'}`}>

@@ -1,6 +1,16 @@
 // src/components/Button.tsx
 import React from 'react';
-import { TouchableOpacity, Text, ActivityIndicator, TouchableOpacityProps } from 'react-native';
+import {
+  TouchableOpacity,
+  Text,
+  ActivityIndicator,
+  TouchableOpacityProps,
+  StyleSheet,
+  ViewStyle,
+  TextStyle,
+} from 'react-native';
+import { shadows } from '../theme/shadows';
+import { colors } from '../theme/colors';
 
 interface ButtonProps extends TouchableOpacityProps {
   title: string;
@@ -12,48 +22,76 @@ export default function Button({
   title,
   variant = 'primary',
   loading = false,
-  className = '',
   disabled,
+  style,
   ...props
 }: ButtonProps) {
-  let buttonStyle = 'w-full py-4 rounded-xl flex-row items-center justify-center ';
-  let textStyle = 'font-bold text-base ';
-
-  switch (variant) {
-    case 'primary':
-      buttonStyle += 'bg-primary shadow-md shadow-primary/20';
-      textStyle += 'text-white';
-      break;
-    case 'secondary':
-      buttonStyle += 'bg-neutral-900';
-      textStyle += 'text-white';
-      break;
-    case 'outline':
-      buttonStyle += 'bg-transparent border border-neutral-300';
-      textStyle += 'text-neutral-950';
-      break;
-    case 'ghost':
-      buttonStyle += 'bg-transparent';
-      textStyle += 'text-primary';
-      break;
-  }
-
-  if (disabled || loading) {
-    buttonStyle += ' opacity-50';
-  }
+  const variantStyles = VARIANT_STYLES[variant];
 
   return (
     <TouchableOpacity
       activeOpacity={0.8}
       disabled={disabled || loading}
-      className={`${buttonStyle} ${className}`}
+      style={[
+        styles.base,
+        variantStyles.button,
+        variant === 'primary' ? shadows.primarySm : null,
+        disabled || loading ? styles.disabled : null,
+        style,
+      ]}
       {...props}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'outline' || variant === 'ghost' ? '#FF5A1F' : 'white'} />
+        <ActivityIndicator
+          color={variant === 'outline' || variant === 'ghost' ? colors.primary : '#FFFFFF'}
+        />
       ) : (
-        <Text className={textStyle}>{title}</Text>
+        <Text style={[styles.text, variantStyles.text]}>{title}</Text>
       )}
     </TouchableOpacity>
   );
 }
+
+const styles = StyleSheet.create({
+  base: {
+    width: '100%',
+    paddingVertical: 16,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+    fontWeight: '700',
+    fontSize: 16,
+  },
+  disabled: {
+    opacity: 0.5,
+  },
+});
+
+const VARIANT_STYLES: Record<
+  NonNullable<ButtonProps['variant']>,
+  { button: ViewStyle; text: TextStyle }
+> = {
+  primary: {
+    button: { backgroundColor: colors.primary },
+    text: { color: '#FFFFFF' },
+  },
+  secondary: {
+    button: { backgroundColor: colors.textPrimary },
+    text: { color: '#FFFFFF' },
+  },
+  outline: {
+    button: {
+      backgroundColor: 'transparent',
+      borderWidth: 1,
+      borderColor: colors.borderStrong,
+    },
+    text: { color: colors.textPrimary },
+  },
+  ghost: {
+    button: { backgroundColor: 'transparent' },
+    text: { color: colors.primary },
+  },
+};
